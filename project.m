@@ -1,7 +1,7 @@
 clearvars,
 close all,
 clc,
-ima = imread('tomas/fotos_aruco/12.jpg');
+ima = imread('tomas/fotos_aruco/5.jpg');
 %figure(6)
 %h = histogram(ima);
 % Aplicamos un threshold para aislar el negro del marcador ArUco
@@ -45,6 +45,7 @@ es1 = coor(find(coor(:,1)==xmin),:);
 es2 = coor(find(coor(:,2)==ymin),:);
 es3 = coor(find(coor(:,1)==xmax),:);
 es4 = coor(find(coor(:,2)==ymax),:);
+es = [es1;es2;es3;es4];
 figure(1);subplot(2,2,2);imshow(fima);
 hold on;
 plot(es1(1),es1(2),'.','Color','r','MarkerSize',20)
@@ -155,18 +156,17 @@ coor = rmoutliers(coor);
 xmin = min(coor(:,1)); xmax = max(coor(:,1));
 ymin = min(coor(:,2)); ymax = max(coor(:,2));
 
-es1 = [xmin ymin];
-es2 = [xmax ymin];
-es3 = [xmax ymax];
-es4 = [xmin ymax];
-es = [es1 es2 es3 es4];
+esq1 = [xmin ymin];
+esq2 = [xmax ymin];
+esq3 = [xmax ymax];
+esq4 = [xmin ymax];
 
 figure(1);subplot(2,2,3);imshow(rima_w);
 hold on;
-plot(es1(1),es1(2),'.','Color','r','MarkerSize',20)
-plot(es2(1),es2(2),'.','Color','r','MarkerSize',20)
-plot(es3(1),es3(2),'.','Color','r','MarkerSize',20)
-plot(es4(1),es4(2),'.','Color','r','MarkerSize',20)
+plot(esq1(1),esq1(2),'.','Color','r','MarkerSize',20)
+plot(esq2(1),esq2(2),'.','Color','r','MarkerSize',20)
+plot(esq3(1),esq3(2),'.','Color','r','MarkerSize',20)
+plot(esq4(1),esq4(2),'.','Color','r','MarkerSize',20)
 title('esquinas homografía');
 hold off;
 
@@ -185,9 +185,9 @@ sqy = int64(h/nsquares);
 jima = imcrop(bima,[sqx sqy w-sqx*2 h-sqy*2]);
 [w,h] = size(jima);
 %subplot(1,4,3);imshow(jima);title('aruco crop');
-for x = 0:sqx+1:w %retocar,falla
+for x = 0:sqx+3:w %retocar,falla
     fil = [];
-    for y = 0:sqy+1:h
+    for y = 0:sqy+3:h
         maj = jima((int8(x+sqx*(1-th))):(int8(x+sqx*th)),(int8(y+sqy*(1-th))):(int8(y+sqy*th)));
         fil(end+1) = mode(mode(maj));
     end
@@ -220,9 +220,9 @@ h2 = imread('tomas/fotos_aruco/h2.jpg');
 h_1 = 500;
 h_2 = 1000;
 height = 0;
-figure(2)
-subplot(1,2,1); imshow(h1);title('h1 500mm');
-subplot(1,2,2); imshow(h2);title('h2 1000mm');
+%figure(2)
+%subplot(1,2,1); imshow(h1);title('h1 500mm');
+%subplot(1,2,2); imshow(h2);title('h2 1000mm');
 h1_p1 = [1106 595];
 h1_p2 = [1601 595];
 h2_p1 = [1215 606];
@@ -230,20 +230,17 @@ h2_p2 = [1467 593];
 l = sqrt((es1(1)-es2(1))^2+(es1(2)-es2(2))^2);
 l1 = sqrt((h1_p1(1)-h1_p2(1))^2+(h1_p1(2)-h1_p2(2))^2);
 l2 = sqrt((h2_p1(1)-h2_p2(1))^2+(h2_p1(2)-h2_p2(2))^2);
-disp([l l1 l2])
-disp((h_1*l2)/l1)
-height = (h_1*l)/l1;
-coefficients = polyfit([l1,h_1], [l2, h_2], 1);
-a = coefficients(1);
-b = coefficients(2);
 
-
+%equacion recta
+m = -0.21;
+n = 151.99;
+height = m*l+n;
 
 cima = imrotate(cima,r);
 [w,h] = size(cima);
 figure(1);subplot(2,2,4);imshow(cima);title('ArUco');
 text(w/2,h/2,'ID='+string(id),'Color','red','FontSize',14,'HorizontalAlignment','center');
-text(w/2,h/2+30,'height='+string(height),'Color','red','FontSize',14,'HorizontalAlignment','center');
+text(w/2,h/2+30,'height='+string(height)+'cm','Color','red','FontSize',14,'HorizontalAlignment','center');
 
 
 
